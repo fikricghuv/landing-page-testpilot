@@ -116,6 +116,7 @@ export const Product: React.FC = () => {
   const [isPointerInside, setIsPointerInside] = useState(false);
   const [isFocusInside, setIsFocusInside] = useState(false);
   const [rotationResetKey, setRotationResetKey] = useState(0);
+  const [panelStep] = useState(3);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [isDesktopLg, setIsDesktopLg] = useState(true);
 
@@ -280,22 +281,15 @@ export const Product: React.FC = () => {
 
                     {/* Desktop Accordion Description */}
                     <div
-                      className="hidden pl-5 lg:block"
-                      style={{
-                        display: 'grid',
-                        gridTemplateRows: isActive ? '1fr' : '0fr',
-                        opacity: isActive ? 1 : 0,
-                        marginTop: isActive ? '0.625rem' : '0',
-                        transition: prefersReducedMotion
-                          ? 'none'
-                          : 'grid-template-rows 280ms cubic-bezier(0.16, 1, 0.3, 1), opacity 240ms ease-out, margin-top 280ms ease-out',
-                      }}
+                      className={`hidden overflow-hidden pl-5 lg:block ${prefersReducedMotion ? '' : 'transition-all duration-300 ease-out'
+                        } ${isActive
+                          ? 'max-h-20 opacity-100 mt-2.5'
+                          : 'max-h-0 opacity-0 mt-0 pointer-events-none'
+                        }`}
                     >
-                      <div className="overflow-hidden">
-                        <p className="text-[14px] leading-relaxed text-graphite font-normal">
-                          {cap.description}
-                        </p>
-                      </div>
+                      <p className="text-[14px] leading-relaxed text-graphite font-normal">
+                        {cap.description}
+                      </p>
                     </div>
                   </button>
                 );
@@ -404,7 +398,14 @@ export const Product: React.FC = () => {
 
                     {/* Panel Content Body */}
                     <div className="relative min-h-0 flex-1 p-4 sm:p-5">
-                      <div key={activeTab} className="animate-visual-entry flex flex-col">
+                      <div
+                        key={activeTab}
+                        style={{
+                          animation: prefersReducedMotion
+                            ? 'none'
+                            : 'visual-fade-in 250ms cubic-bezier(0.16, 1, 0.3, 1) both',
+                        }}
+                      >
                         {/* Shared Capability Context Summary */}
                         <div className="rounded-xl bg-paper p-3 sm:p-4 ring-1 ring-[var(--hairline)] shadow-sm">
                           <div className="flex items-start gap-3">
@@ -435,6 +436,7 @@ export const Product: React.FC = () => {
                         <CapabilityVisual
                           capabilityId={activeCapability.id}
                           prefersReducedMotion={prefersReducedMotion}
+                          revealStep={panelStep}
                         />
                       </div>
                     </div>
