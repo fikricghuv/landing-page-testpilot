@@ -116,7 +116,6 @@ export const Product: React.FC = () => {
   const [isPointerInside, setIsPointerInside] = useState(false);
   const [isFocusInside, setIsFocusInside] = useState(false);
   const [rotationResetKey, setRotationResetKey] = useState(0);
-  const [panelStep, setPanelStep] = useState(0);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [isDesktopLg, setIsDesktopLg] = useState(true);
 
@@ -144,24 +143,6 @@ export const Product: React.FC = () => {
     };
   }, []);
 
-  // Finite staggered reveal for capability preview cards (stops after final stage 3)
-  useEffect(() => {
-    if (prefersReducedMotion) {
-      setPanelStep(3);
-      return;
-    }
-
-    setPanelStep(0);
-    const timers = [
-      window.setTimeout(() => setPanelStep(1), 120),
-      window.setTimeout(() => setPanelStep(2), 260),
-      window.setTimeout(() => setPanelStep(3), 400),
-    ];
-
-    return () => {
-      timers.forEach((id) => window.clearTimeout(id));
-    };
-  }, [activeTab, prefersReducedMotion]);
 
   const selectTab = (index: number, moveFocus = false) => {
     setActiveTab(index);
@@ -299,15 +280,22 @@ export const Product: React.FC = () => {
 
                     {/* Desktop Accordion Description */}
                     <div
-                      className={`hidden overflow-hidden pl-5 lg:block ${prefersReducedMotion ? '' : 'transition-all duration-500'
-                        } ${isActive
-                          ? 'max-h-40 opacity-100 mt-2.5'
-                          : 'max-h-0 opacity-0 mt-0 pointer-events-none'
-                        }`}
+                      className="hidden pl-5 lg:block"
+                      style={{
+                        display: 'grid',
+                        gridTemplateRows: isActive ? '1fr' : '0fr',
+                        opacity: isActive ? 1 : 0,
+                        marginTop: isActive ? '0.625rem' : '0',
+                        transition: prefersReducedMotion
+                          ? 'none'
+                          : 'grid-template-rows 280ms cubic-bezier(0.16, 1, 0.3, 1), opacity 240ms ease-out, margin-top 280ms ease-out',
+                      }}
                     >
-                      <p className="text-[14px] leading-relaxed text-graphite font-normal">
-                        {cap.description}
-                      </p>
+                      <div className="overflow-hidden">
+                        <p className="text-[14px] leading-relaxed text-graphite font-normal">
+                          {cap.description}
+                        </p>
+                      </div>
                     </div>
                   </button>
                 );
@@ -416,38 +404,39 @@ export const Product: React.FC = () => {
 
                     {/* Panel Content Body */}
                     <div className="relative min-h-0 flex-1 p-4 sm:p-5">
-                      {/* Shared Capability Context Summary */}
-                      <div className="rounded-xl bg-paper p-3 sm:p-4 ring-1 ring-[var(--hairline)] shadow-sm">
-                        <div className="flex items-start gap-3">
-                          <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-ink text-canvas ring-1 ring-[var(--hairline)]">
-                            <svg aria-hidden="true" className="size-4 text-sky" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                            </svg>
-                          </span>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-[13px] font-bold text-ink">
-                              {activeCapability.title}
-                            </p>
-                            <div className="mt-2 flex flex-wrap gap-1.5">
-                              {activeCapability.features.map((feature) => (
-                                <span
-                                  key={feature}
-                                  className="rounded-md bg-canvas px-2 py-0.5 text-[11px] font-medium text-graphite ring-1 ring-[var(--hairline)]"
-                                >
-                                  {feature}
-                                </span>
-                              ))}
+                      <div key={activeTab} className="animate-visual-entry flex flex-col">
+                        {/* Shared Capability Context Summary */}
+                        <div className="rounded-xl bg-paper p-3 sm:p-4 ring-1 ring-[var(--hairline)] shadow-sm">
+                          <div className="flex items-start gap-3">
+                            <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-ink text-canvas ring-1 ring-[var(--hairline)]">
+                              <svg aria-hidden="true" className="size-4 text-sky" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                              </svg>
+                            </span>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[13px] font-bold text-ink">
+                                {activeCapability.title}
+                              </p>
+                              <div className="mt-2 flex flex-wrap gap-1.5">
+                                {activeCapability.features.map((feature) => (
+                                  <span
+                                    key={feature}
+                                    className="rounded-md bg-canvas px-2 py-0.5 text-[11px] font-medium text-graphite ring-1 ring-[var(--hairline)]"
+                                  >
+                                    {feature}
+                                  </span>
+                                ))}
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
 
-                      {/* Feature-Specific Visualization */}
-                      <CapabilityVisual
-                        capabilityId={activeCapability.id}
-                        prefersReducedMotion={prefersReducedMotion}
-                        revealStep={panelStep}
-                      />
+                        {/* Feature-Specific Visualization */}
+                        <CapabilityVisual
+                          capabilityId={activeCapability.id}
+                          prefersReducedMotion={prefersReducedMotion}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
