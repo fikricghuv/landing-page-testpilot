@@ -544,7 +544,15 @@ export const Navbar: React.FC = () => {
         </div>
       </div>
       <div className="max-h-[calc(100svh-64px)] overflow-y-auto border-t hairline bg-canvas lg:hidden" hidden={!mobileMenuOpen} id="mobile-menu">
-        <nav aria-label="Mobile" className="mx-auto max-w-[1440px] px-4 pb-6 pt-2 sm:px-6">
+        <nav
+          aria-label="Mobile"
+          className="mx-auto max-w-[1440px] px-4 pb-6 pt-2 sm:px-6"
+          onClick={(e) => {
+            if ((e.target as HTMLElement).closest('a[href]')) {
+              setMobileMenuOpen(false);
+            }
+          }}
+        >
           <ul>
             <li>
               <a className="group flex items-center gap-3 border-b hairline py-3.5 text-[19px] font-semibold tracking-tight" href="#product">
@@ -741,7 +749,7 @@ export const Navbar: React.FC = () => {
               </a>
             </li>
             <li>
-              <a className="group flex items-center gap-3 border-b hairline py-3.5 text-[19px] font-semibold tracking-tight" href="#capabilities">
+              <a className="group flex items-center gap-3 border-b hairline py-3.5 text-[19px] font-semibold tracking-tight" href="#product">
                 <svg aria-hidden="true" className="size-6 shrink-0 size-6 text-sky" viewBox="0 0 13 13">
                   <circle cx="0.5" cy="0.5" fill="currentColor" r="0.46" style={{ ['--s' as any]: '1.00', transitionDelay: '0ms' }} />
                   <circle cx="1.5" cy="0.5" fill="currentColor" r="0.46" style={{ ['--s' as any]: '1.00', transitionDelay: '14ms' }} />
